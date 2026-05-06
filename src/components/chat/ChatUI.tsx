@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import api from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Paperclip, Camera, Plus, Dna, User, X, PenLine, FileText, Menu } from "lucide-react";
+import { Send, Paperclip, Camera, Plus, Dna, User, X, PenLine, FileText, Menu, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import CameraModal from "./CameraModal";
 
@@ -159,7 +159,7 @@ export default function ChatUI() {
       if (res.data.history) {
         setBackendHistory(res.data.history);
       }
-      
+
       if (res.data.session_id && res.data.session_id !== currentSessionId) {
         setCurrentSessionId(res.data.session_id);
         fetchChats(); // Refresh sidebar
@@ -190,6 +190,21 @@ export default function ChatUI() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleDeleteChat = async (e: React.MouseEvent, sessionId: string) => {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this chat?")) return;
+
+    try {
+      await api.delete(`/history/${sessionId}`);
+      setChatSessions((prev) => prev.filter(s => s.session_id !== sessionId));
+      if (currentSessionId === sessionId) {
+        handleNewChat();
+      }
+    } catch (err) {
+      console.error("Failed to delete chat", err);
+    }
+  };
+
   const loadChat = async (sessionId: string) => {
     try {
       const res = await api.get(`/history/${sessionId}`);
@@ -197,20 +212,20 @@ export default function ChatUI() {
       if (chat) {
         setBackendHistory(chat.messages);
         setCurrentSessionId(sessionId);
-        
+
         // Reconstruct frontend messages
         const loadedMessages: Message[] = chat.messages
-            .filter((m: any) => m.role !== 'system')
-            .map((m: any) => {
-                let text = m.content;
-                if (m.role === 'tool') text = `🔧 Used tool: ${m.name}\n\n${m.content}`;
-                return {
-                    role: m.role === 'user' ? 'user' : 'bot',
-                    text: text || ''
-                };
-            })
-            .filter((m: any) => m.text);
-            
+          .filter((m: any) => m.role !== 'system')
+          .map((m: any) => {
+            let text = m.content;
+            if (m.role === 'tool') text = `🔧 Used tool: ${m.name}\n\n${m.content}`;
+            return {
+              role: m.role === 'user' ? 'user' : 'bot',
+              text: text || ''
+            };
+          })
+          .filter((m: any) => m.text);
+
         setMessages(loadedMessages);
       }
     } catch (err) {
@@ -257,7 +272,7 @@ export default function ChatUI() {
             <h1 className="text-2xl font-bold text-[#0a66c2]">AI Health</h1>
             <Dna className="w-8 h-8 text-[#0a66c2]" />
           </div>
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(false)}
             className="p-2 hover:bg-slate-100 rounded-lg md:hidden text-slate-500"
           >
@@ -284,14 +299,25 @@ export default function ChatUI() {
           <h2 className="text-sm font-medium text-slate-400 mb-4 uppercase tracking-wider">Recent Chats</h2>
           <div className="flex flex-col gap-1">
             {chatSessions.map((chat) => (
-              <button 
-                key={chat.session_id} 
-                onClick={() => loadChat(chat.session_id)}
-                className={`text-left w-full text-slate-600 py-2.5 px-3 hover:bg-slate-100 rounded-lg transition-colors text-sm truncate ${currentSessionId === chat.session_id ? 'bg-slate-100 font-semibold' : ''}`}
-                title={chat.title}
+              <div
+                key={chat.session_id}
+                className={`group flex items-center gap-1 w-full rounded-lg transition-colors text-sm ${currentSessionId === chat.session_id ? 'bg-slate-100' : 'hover:bg-slate-100'}`}
               >
-                {chat.title}
-              </button>
+                <button
+                  onClick={() => loadChat(chat.session_id)}
+                  className={`text-left flex-1 text-slate-600 py-2.5 px-3 truncate ${currentSessionId === chat.session_id ? 'font-semibold' : ''}`}
+                  title={chat.title}
+                >
+                  {chat.title}
+                </button>
+                <button
+                  onClick={(e) => handleDeleteChat(e, chat.session_id)}
+                  className="p-2 text-slate-400 hover:text-red-500 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                  title="Delete chat"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -359,8 +385,8 @@ export default function ChatUI() {
                   >
                     <div
                       className={`max-w-[90%] md:max-w-[78%] p-3.5 md:p-4 rounded-2xl shadow-sm ${msg.role === "user"
-                          ? "bg-[#0a66c2] text-white rounded-tr-sm"
-                          : "bg-white text-slate-800 rounded-tl-sm [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ml-4 [&_ul]:mb-2 [&_strong]:font-bold"
+                        ? "bg-[#0a66c2] text-white rounded-tr-sm"
+                        : "bg-white text-slate-800 rounded-tl-sm [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ml-4 [&_ul]:mb-2 [&_strong]:font-bold"
                         }`}
                     >
                       {msg.role === "user" ? (
