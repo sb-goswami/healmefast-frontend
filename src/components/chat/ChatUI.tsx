@@ -3,9 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import api from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Paperclip, Camera, Plus, Dna, User, X, PenLine, FileText, Menu, Trash2 } from "lucide-react";
+import { Send, Paperclip, Camera, Plus, Stethoscope, User, X, PenLine, FileText, Menu, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import CameraModal from "./CameraModal";
+import { useAuth } from "../auth/AuthContext";
+import { LogOut } from "lucide-react";
 
 type Message = {
   role: "user" | "bot";
@@ -25,6 +27,7 @@ type BackendMessage = {
 };
 
 export default function ChatUI() {
+  const { user, logout } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -269,8 +272,8 @@ export default function ChatUI() {
       `}>
         <div className="flex items-center justify-between gap-2 mb-8">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-[#0a66c2]">AI Health</h1>
-            <Dna className="w-8 h-8 text-[#0a66c2]" />
+            <h1 className="text-2xl font-bold text-[#0a66c2]">HealmeFast</h1>
+            <Stethoscope className="w-8 h-8 text-[#0a66c2]" />
           </div>
           <button
             onClick={() => setIsSidebarOpen(false)}
@@ -345,24 +348,67 @@ export default function ChatUI() {
               <User className="w-5 h-5 md:w-6 md:h-6 text-slate-500" />
             </div>
             <div className="flex flex-col pr-1 md:pr-2">
-              <span className="text-xs md:text-sm font-semibold text-slate-800">User123</span>
+              <span className="text-xs md:text-sm font-semibold text-slate-800 truncate max-w-[80px] md:max-w-[120px]">
+                {user?.full_name || "User"}
+              </span>
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></div>
                 <span className="text-[10px] md:text-xs text-green-600 font-medium">Online</span>
               </div>
             </div>
+            <button 
+              onClick={logout}
+              className="p-2 text-slate-400 hover:text-red-500 transition-colors ml-1 border-l border-slate-100 pl-3"
+              title="Log out"
+            >
+              <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
           </div>
         </div>
 
         {/* Messages area — scrollable, pushes down before input */}
         <div className="flex-1 overflow-y-auto z-10 px-4 md:px-6 pt-24 pb-36">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center px-4">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-slate-800 mb-4 md:mb-6 flex flex-wrap items-center justify-center gap-3">
-                AI Health Assistant <span>🧠</span>
-              </h2>
-              <p className="text-lg md:text-xl text-slate-600 mb-2">Upload a report or describe your symptoms</p>
-              <p className="text-xs md:text-sm text-slate-400">Use the 📎 button to upload a PDF or image</p>
+            <div className="h-full flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white/40 backdrop-blur-md border border-white/40 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-500/10"
+              >
+                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-600/20 rotate-3">
+                  <Stethoscope className="w-10 h-10 text-white" />
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+                  HealmeFast <span className="text-blue-600">AI</span>
+                </h2>
+                <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed">
+                  Your intelligent companion for instant health insights and medical report analysis.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                  <div className="p-4 bg-white/60 rounded-2xl border border-white/60">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                      <FileText className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <h3 className="font-semibold text-slate-800 mb-1">Analyze Reports</h3>
+                    <p className="text-xs text-slate-500">Upload any lab result or medical PDF for instant explanation.</p>
+                  </div>
+                  <div className="p-4 bg-white/60 rounded-2xl border border-white/60">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+                      <Plus className="w-4 h-4 text-green-600" />
+                    </div>
+                    <h3 className="font-semibold text-slate-800 mb-1">Check Symptoms</h3>
+                    <p className="text-xs text-slate-500">Describe how you feel to get a quick triage and advice.</p>
+                  </div>
+                </div>
+
+                <div className="mt-10 flex items-center justify-center gap-2 text-slate-400 text-sm font-medium">
+                  <div className="w-8 h-[1px] bg-slate-200"></div>
+                  <span>Start by uploading a file or typing below</span>
+                  <div className="w-8 h-[1px] bg-slate-200"></div>
+                </div>
+              </motion.div>
             </div>
           ) : (
             <div className="max-w-4xl mx-auto flex flex-col gap-4">
