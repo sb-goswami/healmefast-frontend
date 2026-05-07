@@ -335,30 +335,30 @@ export default function ChatUI() {
         />
 
         {/* Header */}
-        <div className="absolute top-4 md:top-6 left-4 md:left-auto right-4 md:right-6 z-20 flex items-center justify-between md:justify-end gap-3">
+        <div className="absolute top-3 md:top-6 left-3 md:left-auto right-3 md:right-6 z-20 flex items-center justify-between md:justify-end gap-2">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2.5 bg-white/80 backdrop-blur-sm hover:bg-white rounded-xl shadow-sm border border-slate-100 md:hidden text-slate-600"
+            className="p-2 bg-white/90 backdrop-blur-sm hover:bg-white rounded-xl shadow-sm border border-slate-100 md:hidden text-slate-600 shrink-0"
           >
             <Menu className="w-6 h-6" />
           </button>
 
-          <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-100">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-200 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 md:w-6 md:h-6 text-slate-500" />
+          <div className="flex items-center gap-2 md:gap-3 bg-white/90 backdrop-blur-sm px-2.5 md:px-4 py-1 md:py-2 rounded-full shadow-sm border border-slate-100 min-w-0">
+            <div className="w-7 h-7 md:w-10 md:h-10 bg-slate-200 rounded-full flex items-center justify-center shrink-0">
+              <User className="w-4 h-4 md:w-6 md:h-6 text-slate-500" />
             </div>
-            <div className="flex flex-col pr-1 md:pr-2">
-              <span className="text-xs md:text-sm font-semibold text-slate-800 truncate max-w-[80px] md:max-w-[120px]">
+            <div className="flex flex-col pr-1 md:pr-2 min-w-0">
+              <span className="text-[10px] md:text-sm font-semibold text-slate-800 truncate max-w-[60px] xs:max-w-[100px] md:max-w-[150px]">
                 {user?.full_name || "User"}
               </span>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></div>
-                <span className="text-[10px] md:text-xs text-green-600 font-medium">Online</span>
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                <span className="text-[9px] md:text-xs text-green-600 font-medium">Online</span>
               </div>
             </div>
             <button 
               onClick={logout}
-              className="p-2 text-slate-400 hover:text-red-500 transition-colors ml-1 border-l border-slate-100 pl-3"
+              className="p-1.5 text-slate-400 hover:text-red-500 transition-colors border-l border-slate-100 pl-2"
               title="Log out"
             >
               <LogOut className="w-4 h-4 md:w-5 md:h-5" />
@@ -367,7 +367,7 @@ export default function ChatUI() {
         </div>
 
         {/* Messages area — scrollable, pushes down before input */}
-        <div className="flex-1 overflow-y-auto z-10 px-4 md:px-6 pt-24 pb-36">
+        <div className="flex-1 overflow-y-auto z-10 px-3 md:px-6 pt-20 md:pt-24 pb-32 md:pb-36 scroll-smooth">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto">
               <motion.div 
