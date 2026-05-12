@@ -218,13 +218,11 @@ export default function ChatUI() {
 
         // Reconstruct frontend messages
         const loadedMessages: Message[] = chat.messages
-          .filter((m: any) => m.role !== 'system')
+          .filter((m: any) => m.role === 'user' || m.role === 'assistant')
           .map((m: any) => {
-            let text = m.content;
-            if (m.role === 'tool') text = `🔧 Used tool: ${m.name}\n\n${m.content}`;
             return {
               role: m.role === 'user' ? 'user' : 'bot',
-              text: text || ''
+              text: m.content || ''
             };
           })
           .filter((m: any) => m.text);
